@@ -6,8 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from apps.auth_users.models import UserProfile
-
+from users.models import UserProfile
 
 def _json_error(message: str, status: int = 400) -> JsonResponse:
     return JsonResponse({"success": False, "error": message}, status=status)
