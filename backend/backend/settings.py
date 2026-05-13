@@ -30,7 +30,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,14 +37,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    
     # Librairies
     'rest_framework',
     'corsheaders',
+    
     # Nos apps
     'users',
-    'jobs',
     'matching',
+    'scraping',
+    'nlp_engine',
+    'results',
 ]
 
 MIDDLEWARE = [
