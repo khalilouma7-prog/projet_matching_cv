@@ -7,4 +7,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),
     path('api/matching/', include('matching.urls')),
+    path('api/nlp/', include('nlp_engine.urls')),      
+    path('api/results/', include('results.urls')), 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
