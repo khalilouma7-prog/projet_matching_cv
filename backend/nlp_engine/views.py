@@ -46,7 +46,7 @@ def _json_ok(data: dict, status: int = 200) -> JsonResponse:
 # ──────────────────────────────────────────────
 
 @csrf_exempt
-@login_required
+
 @require_http_methods(["POST"])
 def upload_cv(request):
     """

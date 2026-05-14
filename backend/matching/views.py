@@ -13,17 +13,23 @@ def match_uploaded_cv_view(request):
         return JsonResponse({"error": "Use POST method"}, status=405)
     if "cv" not in request.FILES:
         return JsonResponse({"error": "No CV file uploaded"}, status=400)
+
     cv_file = request.FILES["cv"]
     if not (cv_file.name.endswith(".pdf") or cv_file.name.endswith(".docx")):
         return JsonResponse({"error": "Only PDF and DOCX files are allowed"}, status=400)
-    uploaded_cv = UploadedCV.objects.create(file=cv_file)
+
+    uploaded_cv = UploadedCV.objects.create(file=cv_file)  # ✅ pas de user requis
     file_path = uploaded_cv.file.path
+
     try:
         cv_text = read_cv_file(file_path)
         cleaned_cv = clean_cv_text(cv_text)
+
+        # Récupère le profil si connecté, sinon valeurs par défaut
         user_profile = None
         if request.user.is_authenticated:
             user_profile = UserProfile.objects.filter(user=request.user).first()
+
         matching_payload = compute_matching(
             cleaned_cv,
             user_experience_years=(user_profile.experience_years if user_profile else 0.0),
@@ -39,9 +45,12 @@ def match_uploaded_cv_view(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
+
+@csrf_exempt
 def map_offers_view(request):
     if request.method != "GET":
         return JsonResponse({"error": "Use GET method"}, status=405)
+    from scraping.models import JobOffer
     offers = JobOffer.objects.all()
     points = []
     for offer in offers:

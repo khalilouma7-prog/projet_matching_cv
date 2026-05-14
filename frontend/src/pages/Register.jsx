@@ -13,10 +13,17 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await api.post('/users/register/', form)
-      localStorage.setItem('token', res.data.access)
+      const res = await api.post('/users/auth/register/', {
+        name: form.username,
+        email: form.email,
+        password: form.password,
+        city: form.localisation,
+        experience_years: form.experience_annees,
+      })
+      localStorage.setItem('user', JSON.stringify(res.data.user))
       navigate('/dashboard')
     } catch (err) {
+      console.error('ERREUR:', err.response?.data || err.message)  // ← ajouté
       setErreur('Erreur lors de l\'inscription')
     }
   }
