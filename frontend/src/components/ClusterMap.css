@@ -1,0 +1,8 @@
+/* frontend/src/components/ClusterMap.css */
+.cluster-grid  { display:flex; gap:16px; flex-wrap:wrap; }
+.cluster-card  { flex:1 1 160px; background:var(--surface2); border-radius:10px; padding:16px; border:1px solid var(--border); }
+.cluster-icon  { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+.cluster-dot   { width:12px; height:12px; border-radius:3px; }
+.cluster-label { font-family:var(--font-display); font-size:13px; font-weight:700; margin-bottom:6px; }
+.cluster-count { font-family:var(--font-display); font-size:24px; font-weight:800; line-height:1; }
+.cluster-sub   { font-size:11px; color:var(--muted); margin-top:2px; }
