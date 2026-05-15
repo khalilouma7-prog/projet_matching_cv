@@ -1,38 +1,11 @@
-/* ── Stat Cards ── */
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 22px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.2s, transform 0.2s;
-}
-.stat-card:hover { border-color: var(--card-color, var(--accent)); transform: translateY(-2px); }
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--card-color, var(--accent));
-}
-.stat-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: radial-gradient(ellipse at top left, rgba(0,229,160,0.04), transparent 70%);
-  pointer-events: none;
-}
-.stat-icon { position: absolute; right: 18px; top: 18px; font-size: 24px; opacity: 0.12; }
-.stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
-.stat-value { font-family: var(--font-display); font-size: 30px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
-.stat-sub { font-size: 11px; color: var(--muted); }
+.stat-card         { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; position: relative; overflow: hidden; box-shadow: var(--shadow); transition: box-shadow 0.2s, transform 0.2s; }
+.stat-card:hover   { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: var(--card-color, var(--accent)); border-radius: var(--radius) var(--radius) 0 0; }
+.stat-icon         { position: absolute; right: 18px; top: 18px; font-size: 22px; opacity: 0.15; }
+.stat-label        { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+.stat-value        { font-family: var(--font-display); font-size: 30px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+.stat-sub          { font-size: 11px; color: var(--muted); }
 
-/* ── Offer List ── */
-.offer-list { display: flex; flex-direction: column; gap: 8px; max-height: 480px; overflow-y: auto; padding-right: 4px; }
+.offer-list        { display: flex; flex-direction: column; gap: 8px; max-height: 480px; overflow-y: auto; }
 .offer-list::-webkit-scrollbar { width: 4px; }
-.offer-list::-webkit-scrollbar-track { background: transparent; }
 .offer-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-/* ── Section Label ── */
-.section-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
