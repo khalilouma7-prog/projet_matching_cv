@@ -2,16 +2,15 @@ import json
 
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from django.contrib.auth import login as django_login  # ✅
 User = get_user_model()
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-
 from users.models import UserProfile
 
 def _json_error(message: str, status: int = 400) -> JsonResponse:
     return JsonResponse({"success": False, "error": message}, status=status)
-
 
 def _json_ok(data: dict, status: int = 200) -> JsonResponse:
     return JsonResponse({"success": True, **data}, status=status)
@@ -19,19 +18,17 @@ def _json_ok(data: dict, status: int = 200) -> JsonResponse:
 
 @require_http_methods(["GET"])
 def api_root_view(request):
-    return _json_ok(
-        {
-            "message": "CV Matching API is running.",
-            "endpoints": {
-                "auth_register": "/api/auth/register/",
-                "auth_login": "/api/auth/login/",
-                "user_profile_get_put": "/api/users/<user_id>/",
-                "match_cv": "/api/match-cv/",
-                "map_offers": "/api/map-offers/",
-                "nlp": "/api/nlp/",
-            },
-        }
-    )
+    return _json_ok({
+        "message": "CV Matching API is running.",
+        "endpoints": {
+            "auth_register": "/api/auth/register/",
+            "auth_login": "/api/auth/login/",
+            "user_profile_get_put": "/api/users/<user_id>/",
+            "match_cv": "/api/match-cv/",
+            "map_offers": "/api/map-offers/",
+            "nlp": "/api/nlp/",
+        },
+    })
 
 
 @csrf_exempt
@@ -59,20 +56,21 @@ def register_view(request):
     )
     profile = UserProfile.objects.create(user=user, full_name=full_name)
 
-    return _json_ok(
-        {
-            "user": {
-                "id": user.id,
-                "name": profile.full_name,
-                "email": user.email,
-                "city": profile.city,
-                "experience_years": profile.experience_years,
-                "skills_manual": profile.skills_manual or "",
-                "education": profile.education or "",
-            }
-        },
-        status=201,
-    )
+    # ✅ Crée la session Django après inscription
+    django_login(request, user)
+
+    return _json_ok({
+        "user": {
+            "id": user.id,
+            "name": profile.full_name,
+            "email": user.email,
+            "city": profile.city or "",
+            "experience_years": profile.experience_years,
+            "skills_manual": profile.skills_manual or "",
+            "education": profile.education or "",
+            "phone": profile.phone or "",
+        }
+    }, status=201)
 
 
 @csrf_exempt
@@ -92,20 +90,26 @@ def login_view(request):
     if not user:
         return _json_error("Invalid credentials.", status=401)
 
-    profile, _ = UserProfile.objects.get_or_create(user=user, defaults={"full_name": user.first_name or email})
-    return _json_ok(
-        {
-            "user": {
-                "id": user.id,
-                "name": profile.full_name,
-                "email": user.email,
-                "city": profile.city,
-                "experience_years": profile.experience_years,
-                "skills_manual": profile.skills_manual or "",
-                "education": profile.education or "",
-            }
-        }
+    # ✅ Crée la session Django
+    django_login(request, user)
+
+    profile, _ = UserProfile.objects.get_or_create(
+        user=user,
+        defaults={"full_name": user.first_name or email}
     )
+
+    return _json_ok({
+        "user": {
+            "id": user.id,
+            "name": profile.full_name,
+            "email": user.email,
+            "city": profile.city or "",
+            "experience_years": profile.experience_years,
+            "skills_manual": profile.skills_manual or "",
+            "education": profile.education or "",
+            "phone": profile.phone or "",
+        }
+    })
 
 
 @csrf_exempt
@@ -116,23 +120,24 @@ def user_profile_view(request, user_id: int):
     except User.DoesNotExist:
         return _json_error("User not found.", status=404)
 
-    profile, _ = UserProfile.objects.get_or_create(user=user, defaults={"full_name": user.first_name or user.username})
+    profile, _ = UserProfile.objects.get_or_create(
+        user=user,
+        defaults={"full_name": user.first_name or user.username}
+    )
 
     if request.method == "GET":
-        return _json_ok(
-            {
-                "profile": {
-                    "id": user.id,
-                    "name": profile.full_name,
-                    "email": user.email,
-                    "city": profile.city or "",
-                    "experience_years": profile.experience_years or 0,
-                    "skills_manual": profile.skills_manual or "",
-                    "education": profile.education or "",
-                    "phone": profile.phone or "",
-                }
+        return _json_ok({
+            "profile": {
+                "id": user.id,
+                "name": profile.full_name,
+                "email": user.email,
+                "city": profile.city or "",
+                "experience_years": profile.experience_years or 0,
+                "skills_manual": profile.skills_manual or "",
+                "education": profile.education or "",
+                "phone": profile.phone or "",
             }
-        )
+        })
 
     try:
         body = json.loads(request.body)
@@ -152,16 +157,15 @@ def user_profile_view(request, user_id: int):
     user.username = user.email
     user.save()
 
-    return _json_ok(
-        {
-            "profile": {
-                "id": user.id,
-                "name": profile.full_name,
-                "email": user.email,
-                "city": profile.city or "",
-                "experience_years": profile.experience_years or 0,
-                "skills_manual": profile.skills_manual or "",
-                "education": profile.education or "",
-            }
+    return _json_ok({
+        "profile": {
+            "id": user.id,
+            "name": profile.full_name,
+            "email": user.email,
+            "city": profile.city or "",
+            "experience_years": profile.experience_years or 0,
+            "skills_manual": profile.skills_manual or "",
+            "education": profile.education or "",
+            "phone": profile.phone or "",
         }
-    )
+    })

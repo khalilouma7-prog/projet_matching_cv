@@ -2,9 +2,9 @@ import re
 import unicodedata
  
  
-# ──────────────────────────────────────────────
+
 # Phrases injected by CV template generators
-# ──────────────────────────────────────────────
+
 UNWANTED_PHRASES = [
     "Icônes pour CV à copier-coller",
     "Un modèle Word, c'est bien.",

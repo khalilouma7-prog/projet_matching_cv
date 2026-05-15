@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
-from results.models import MatchResult          # ✅ corrigé
-from scraping.models import JobOffer            # ✅ corrigé
-from matching.matching_engine import compute_matching  # ✅ corrigé
+from results.models import MatchResult        
+from scraping.models import JobOffer            
+from matching.matching_engine import compute_matching  
 
 def save_matching_results(username, user_text):
     user = User.objects.get(username=username)

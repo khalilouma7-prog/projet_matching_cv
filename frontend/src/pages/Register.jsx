@@ -30,7 +30,7 @@ export default function Register() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2 style={styles.titre}>📝 Inscription</h2>
+        <h2 style={styles.titre}>Inscription</h2>
 
         {erreur && <p style={styles.erreur}>{erreur}</p>}
 
