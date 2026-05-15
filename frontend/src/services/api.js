@@ -5,21 +5,21 @@ const API = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-API.interceptors.request.use((config) => {
-  const user = localStorage.getItem("user");
-  return config;
-});
-
 export const authAPI = {
-  login: (email, password) =>
-    API.post("/users/auth/login/", { email, password }),
-  register: (data) =>
-    API.post("/users/auth/register/", data),
+  login: (email, password) => API.post("/users/auth/login/", { email, password }),
+  register: (data) => API.post("/users/auth/register/", data),
 };
 
 export const profileAPI = {
   get: (userId) => API.get(`/users/users/${userId}/`),
   update: (userId, data) => API.put(`/users/users/${userId}/`, data),
+  uploadCV: (file) => {                              // ✅ ajouté
+    const form = new FormData();
+    form.append("cv", file);
+    return API.post("/matching/match-cv/", form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 };
 
 export const matchingAPI = {

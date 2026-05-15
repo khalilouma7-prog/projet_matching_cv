@@ -44,22 +44,31 @@ export default function Profile({ user }) {
   const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   const handleSave = async () => {
-    setSaving(true);
-    try {
-      if (userId) {
-        await profileAPI.update(userId, {
-          name: form.name,
-          email: form.email,
-          city: form.location,
-          experience_years: Number(form.experience) || 0,
-          skills_manual: skills.join(", "),
-          education: form.formation,
-        });
-      }
-      if (cvFile) await profileAPI.uploadCV(cvFile);
-      setSaved(true); setTimeout(() => setSaved(false), 2500);
-    } finally { setSaving(false); }
-  };
+  setSaving(true);
+  try {
+    if (userId) {
+      await profileAPI.update(userId, {
+        name: form.name,
+        email: form.email,
+        city: form.location,
+        experience_years: Number(form.experience) || 0,
+        skills_manual: skills.join(", "),
+        education: form.formation,
+      });
+    }
+    if (cvFile) {
+      const res = await profileAPI.uploadCV(cvFile);  
+      const results = res.data.results || [];
+      localStorage.setItem("matching_results", JSON.stringify(results));
+    }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  } catch(e) {
+    console.error(e);
+  } finally {
+    setSaving(false);
+  }
+};
 
   const addSkill = () => {
     const s = newSkill.trim();

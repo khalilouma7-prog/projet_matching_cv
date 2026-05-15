@@ -14,16 +14,15 @@ export default function Register() {
     e.preventDefault()
     try {
       const res = await api.post('/users/auth/register/', {
-        name: form.username,
-        email: form.email,
-        password: form.password,
-        city: form.localisation,
-        experience_years: form.experience_annees,
-      })
+  name: form.username,        // backend attend "name"
+  email: form.email,
+  password: form.password,
+  city: form.localisation,    // backend attend "city"
+  experience_years: form.experience_annees,
+})
       localStorage.setItem('user', JSON.stringify(res.data.user))
       navigate('/dashboard')
     } catch (err) {
-      console.error('ERREUR:', err.response?.data || err.message)  // ← ajouté
       setErreur('Erreur lors de l\'inscription')
     }
   }
@@ -65,3 +64,4 @@ const styles = {
   btn: { width:'100%', padding:'0.75rem', background:'#4361ee', color:'white', border:'none', borderRadius:'8px', fontSize:'1rem', cursor:'pointer' },
   erreur: { color:'red', textAlign:'center' }
 }
+
