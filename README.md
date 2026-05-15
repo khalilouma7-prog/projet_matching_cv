@@ -298,14 +298,7 @@ Descriptions offres
 
 ---
 
-##  Équipe
 
-| Membre | Branche | Contribution |
-|--------|---------|--------------|
-| Imane CHALATI | `feature/geo-experience` | Profile, Matching, NLP, Scraping |
-| Oumaima KHALIL | `feature/clustering-dashboard` | Dashboard, Clustering, Visualisations |
-
----
 
 ##  Licence
 
