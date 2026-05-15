@@ -104,56 +104,113 @@ export default function Results() {
         </div>
 
         {/* Détail */}
-        {selected && (
-          <div className="results-detail">
-            <div className="card" style={{ marginBottom:16 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:16 }}>
-                <div className="detail-logo"
-                  style={{ background:"linear-gradient(135deg,#00e5a0,#3d7fff)" }}>
-                  📌
-                </div>
-                <div>
-                  <div className="detail-title">{selected.job}</div>
-                  <div className="detail-sub">{selected.company} · 📍 {selected.location}</div>
-                </div>
-              </div>
-              <ScoreRing value={selected.final_score} />
-              {/* Formule */}
-              <div className="formula-grid" style={{ marginTop:18 }}>
-                {[
-                  { label:"Cosinus TF-IDF", val:Math.round(selected.cosine_score)+"%",  w:"×0.50", c:"var(--accent)" },
-                  { label:"Jaccard Skills", val:Math.round(selected.jaccard_score)+"%", w:"×0.25", c:"#3d7fff" },
-                  { label:"Exp. Match",     val:Math.round(selected.experience_score)+"%",w:"×0.15", c:"#a855f7" },
-                  { label:"Geo Match",      val:Math.round(selected.geo_score)+"%",w:"×0.10", c:"#f59e0b" },
-                ].map((m) => (
-                  <div key={m.label} className="formula-item">
-                    <div className="formula-label">{m.label}</div>
-                    <div className="formula-value" style={{ color:m.c }}>{m.val}</div>
-                    <div className="formula-weight">{m.w}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="card" style={{ marginBottom:16 }}>
-              <div className="card-header"><span className="card-title">Profil vs Offre</span></div>
-              <RadarChart data={radarData} />
-            </div>
-
-            <div className="card" style={{ marginBottom:16 }}>
-              <div className="card-header"><span className="card-title">Analyse du clustering</span></div>
-              <div className="chips" style={{ marginBottom:12 }}>
-                <span className="chip match">Cluster K-Means: {selected.cluster_id}</span>
-                <span className="chip">Job ID: {selected.job_id}</span>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-header"><span className="card-title">Localisation</span></div>
-              <GeoMap offers={[selected]} />
-            </div>
+       {selected && (
+  <div className="results-detail">
+    <div className="card" style={{ marginBottom:16 }}>
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"flex-start", gap:14, marginBottom:16 }}>
+        <div className="detail-logo"
+          style={{ background:"linear-gradient(135deg,#4f6ef7,#7c3aed)" }}>
+          📌
+        </div>
+        <div style={{ flex:1 }}>
+          <div className="detail-title">{selected.job}</div>
+          <div className="detail-sub">
+            🏢 {selected.company} · 📍 {selected.location}
           </div>
+          {selected.sector && (
+            <span className="chip" style={{ marginTop:6, display:"inline-block" }}>
+              🏷️ {selected.sector}
+            </span>
+          )}
+        </div>
+        {selected.url && (
+          <a href={selected.url} target="_blank" rel="noreferrer"
+            className="btn btn-ghost" style={{ fontSize:11 }}>
+            Voir l'offre →
+          </a>
         )}
+      </div>
+
+      {/* Score Ring */}
+      <ScoreRing value={selected.final_score} />
+
+      {/* Infos clés */}
+      <div className="detail-info-grid" style={{ marginTop:16 }}>
+        <div className="detail-info-item">
+          <div className="detail-info-label">Contrat</div>
+          <div className="detail-info-val">{selected.contract || "N/A"}</div>
+        </div>
+        <div className="detail-info-item">
+          <div className="detail-info-label">Expérience</div>
+          <div className="detail-info-val">{selected.experience || "Non précisé"}</div>
+        </div>
+        <div className="detail-info-item">
+          <div className="detail-info-label">Cluster</div>
+          <div className="detail-info-val">K-Means #{selected.cluster_id}</div>
+        </div>
+        <div className="detail-info-item">
+          <div className="detail-info-label">Score final</div>
+          <div className="detail-info-val" style={{ color: SC(selected.final_score), fontWeight:700 }}>
+            {selected.final_score}%
+          </div>
+        </div>
+      </div>
+
+      {/* Skills */}
+      {selected.skills?.length > 0 && (
+        <div style={{ marginTop:16 }}>
+          <div className="section-label">Compétences requises</div>
+          <div className="chips">
+            {selected.skills.slice(0,10).map((s, i) => (
+              <span key={i} className={`chip${s.startsWith('[Hard]') ? ' match' : ''}`}>
+                {s.replace('[Hard] ','🔧 ').replace('[Soft] ','💬 ')}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Formule scores */}
+      <div className="formula-grid" style={{ marginTop:16 }}>
+        {[
+          { label:"Cosinus TF-IDF", val:Math.round(selected.cosine_score)+"%", w:"×0.50", c:"#4f6ef7" },
+          { label:"Jaccard Skills", val:Math.round(selected.jaccard_score)+"%", w:"×0.25", c:"#7c3aed" },
+          { label:"Exp. Match",     val:Math.round(selected.experience_score)+"%", w:"×0.15", c:"#059669" },
+          { label:"Geo Match",      val:Math.round(selected.geo_score)+"%", w:"×0.10", c:"#d97706" },
+        ].map((m) => (
+          <div key={m.label} className="formula-item">
+            <div className="formula-label">{m.label}</div>
+            <div className="formula-value" style={{ color:m.c }}>{m.val}</div>
+            <div className="formula-weight">{m.w}</div>
+          </div>
+        ))}
+      </div>
+
+      <button className="btn btn-primary"
+        style={{ width:"100%", marginTop:16, fontSize:13 }}
+        onClick={() => window.location.href="/results"}>
+        Voir tous les résultats →
+      </button>
+    </div>
+
+    {/* Radar */}
+    <div className="card" style={{ marginBottom:16 }}>
+      <div className="card-header">
+        <span className="card-title">Profil vs Offre</span>
+      </div>
+      <RadarChart data={radarData} />
+    </div>
+
+    {/* Carte */}
+    <div className="card">
+      <div className="card-header">
+        <span className="card-title">Localisation</span>
+      </div>
+      <GeoMap offers={[selected]} />
+    </div>
+  </div>
+)}
       </div>
     </div>
   );
