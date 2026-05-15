@@ -129,6 +129,7 @@ def user_profile_view(request, user_id: int):
                     "experience_years": profile.experience_years or 0,
                     "skills_manual": profile.skills_manual or "",
                     "education": profile.education or "",
+                    "phone": profile.phone or "",
                 }
             }
         )
@@ -143,6 +144,7 @@ def user_profile_view(request, user_id: int):
     profile.experience_years = float(body.get("experience_years", profile.experience_years or 0))
     profile.skills_manual = body.get("skills_manual", profile.skills_manual)
     profile.education = body.get("education", profile.education)
+    profile.phone = body.get("phone", profile.phone)
     profile.save()
 
     user.first_name = profile.full_name

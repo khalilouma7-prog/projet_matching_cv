@@ -11,6 +11,7 @@ class UserProfile(models.Model):
     experience_years = models.FloatField(default=0)
     skills_manual = models.TextField(blank=True, null=True)
     education = models.TextField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -23,3 +24,5 @@ class UploadedCV(models.Model):
 
     def __str__(self):
         return self.file.name
+    
+    

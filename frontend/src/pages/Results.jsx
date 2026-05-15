@@ -31,25 +31,36 @@ export default function Results() {
     ];
   }, [selected]);
 
-  const handleUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+ const handleUpload = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-    try {
-      setLoading(true);
-      setError("");
-      const response = await matchingAPI.uploadCV(file);
-      const data = response.data;
-      const nextOffers = data.results || [];
-      localStorage.setItem("matching_results", JSON.stringify(nextOffers));
-      setOffers(nextOffers);
-      setSelected(nextOffers[0] || null);
-    } catch (err) {
-      setError(err?.response?.data?.error || "Erreur lors du matching CV.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    setError("");
+    const response = await matchingAPI.uploadCV(file);
+    const data = response.data;
+    const nextOffers = data.results || [];
+    localStorage.setItem("matching_results", JSON.stringify(nextOffers));
+    setOffers(nextOffers);
+    setSelected(nextOffers[0] || null);
+
+    // ✅ Sauvegarde dans l'historique
+    const hist = JSON.parse(localStorage.getItem("matching_history") || "[]");
+    hist.unshift({
+      date: new Date().toLocaleDateString("fr-FR"),
+      filename: file.name,
+      topScore: nextOffers[0]?.final_score || 0,
+      total: nextOffers.length,
+    });
+    localStorage.setItem("matching_history", JSON.stringify(hist.slice(0, 10)));
+
+  } catch (err) {
+    setError(err?.response?.data?.error || "Erreur lors du matching CV.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="content">

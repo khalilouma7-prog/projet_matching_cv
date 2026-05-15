@@ -20,16 +20,7 @@ export default function Topbar({ page, setPage, onLogout }) {
     <div className="topbar">
       <div className="page-title">{TITLES[page] || "Dashboard"}</div>
       <div className="topbar-actions">
-        <button className="btn btn-ghost" style={{ fontSize: 12 }}>
-          🔔 Alertes
-        </button>
-        <button
-          className="btn btn-primary"
-          style={{ fontSize: 12 }}
-          onClick={() => { setPage("results"); navigate("/results"); }}
-        >
-          🎯 Lancer matching
-        </button>
+          
         <button className="btn btn-ghost" style={{ fontSize: 12 }} onClick={handleLogout}>
           Déconnexion
         </button>
