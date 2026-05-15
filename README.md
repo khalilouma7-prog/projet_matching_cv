@@ -297,6 +297,7 @@ Descriptions offres
 ```
 
 ---
+<img width="389" height="197" alt="image" src="https://github.com/user-attachments/assets/c0ff35f0-2f7c-4806-a698-84452ce8df4e" />
 
 
 
