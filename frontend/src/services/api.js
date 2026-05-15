@@ -5,6 +5,11 @@ const API = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+export const resultsAPI = {
+  getResults: () => API.get("/results/"),
+  getDashboardStats: () => API.get("/results/dashboard-stats/"),  // ✅
+};
+
 export const authAPI = {
   login: (email, password) => API.post("/users/auth/login/", { email, password }),
   register: (data) => API.post("/users/auth/register/", data),
@@ -13,7 +18,7 @@ export const authAPI = {
 export const profileAPI = {
   get: (userId) => API.get(`/users/users/${userId}/`),
   update: (userId, data) => API.put(`/users/users/${userId}/`, data),
-  uploadCV: (file) => {                              // ✅ ajouté
+  uploadCV: (file) => {                              
     const form = new FormData();
     form.append("cv", file);
     return API.post("/matching/match-cv/", form, {
@@ -34,3 +39,4 @@ export const matchingAPI = {
 };
 
 export default API;
+
