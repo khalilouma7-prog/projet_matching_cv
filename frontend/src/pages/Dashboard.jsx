@@ -37,10 +37,10 @@ export default function Dashboard() {
 
   // Utilisation du "Optional Chaining" (?.) pour éviter les crashs
   const STATS = [
-    { label: "Total Offres Scrapées", value: kpis?.total_offres || 0, sub: "Dans la base", icon: "📋", color: "var(--accent)" },
-    { label: "Domaines Identifiés", value: kpis?.domaines_count || 0, sub: "K-Means backend", icon: "🗂️", color: "#f59e0b" },
-    { label: "Analyses de CV", value: kpis?.cv_analyses || 0, sub: "Historique utilisateur", icon: "📄", color: "#a855f7" },
-    { label: "Taux de Match Moyen", value: `${kpis?.avg_score || 0}%`, sub: "Sur vos recherches", icon: "🎯", color: "#3d7fff" },
+    { label: "Total Offres Scrapées", value: kpis?.total_offres || 0, sub: "Dans la base", icon: "", color: "var(--accent)" },
+    { label: "Domaines Identifiés", value: kpis?.domaines_count || 0, sub: "K-Means backend", icon: "", color: "#f59e0b" },
+    { label: "Analyses de CV", value: kpis?.cv_analyses || 0, sub: "Historique utilisateur", icon: "", color: "#a855f7" },
+    { label: "Taux de Match Moyen", value: `${kpis?.avg_score || 0}%`, sub: "Sur vos recherches", icon: "", color: "#3d7fff" },
   ];
 
   return (

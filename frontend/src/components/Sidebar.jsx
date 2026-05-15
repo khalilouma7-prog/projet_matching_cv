@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 
 const NAV = [
-  { id:"dashboard", path:"/dashboard", icon:"▦",  label:"Dashboard"    },
-  { id:"results",   path:"/results",   icon:"🎯", label:"Mes résultats" },
-  { id:"profile",   path:"/profile",   icon:"👤", label:"Mon profil"   },
+  { id:"dashboard", path:"/dashboard", icon:"",  label:"Dashboard"    },
+  { id:"results",   path:"/results",   icon:"", label:"Mes résultats" },
+  { id:"profile",   path:"/profile",   icon:"", label:"Mon profil"   },
 ];
 
 export default function Sidebar({ page, setPage, user }) {
@@ -18,7 +18,7 @@ export default function Sidebar({ page, setPage, user }) {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-logo">◆ <span>CV&Match</span></div>
+      <div className="sidebar-logo"> <span>CV&Match</span></div>
       <div className="nav-section">Navigation</div>
       {NAV.map((n) => (
         <div key={n.id} className={`nav-item${page===n.id?" active":""}`} onClick={() => go(n)}>

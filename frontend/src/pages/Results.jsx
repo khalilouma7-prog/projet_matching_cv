@@ -72,7 +72,7 @@ export default function Results() {
     setOffers(nextOffers);
     setSelected(nextOffers[0] || null);
 
-    // ✅ Sauvegarde dans l'historique
+    //  Sauvegarde dans l'historique
     const hist = JSON.parse(localStorage.getItem("matching_history") || "[]");
     hist.unshift({
       date: new Date().toLocaleDateString("fr-FR"),
@@ -117,7 +117,7 @@ export default function Results() {
             {c}
           </button>
         ))}
-        <span className="filter-count">{filtered.length} offres</span>
+       
       </div>
 
       <div className="results-layout fade-in fade-in-d1">
@@ -128,7 +128,7 @@ export default function Results() {
           )}
           {filtered.map((o, index) => (
             <div
-              key={o.id || index} // ✅ CORRECTION DE L'ERREUR REACT ICI
+              key={o.id || index} //  CORRECTION DE L'ERREUR REACT ICI
               className={`result-row${selected?.id === o.id ? " selected" : ""}`}
               onClick={() => setSelected(o)}
             >
@@ -142,7 +142,7 @@ export default function Results() {
                 <div className="result-title">{o.job || o.job_title}</div>
                 <div className="result-meta">
                   <span>{o.company || "N/A"}</span>
-                  <span>📍 {o.location || "N/A"}</span>
+                  <span> {o.location || "N/A"}</span>
                   <span className="tag">Cluster {o.cluster_id || "N/A"}</span>
                 </div>
                 <div className="score-bar-wrap">
@@ -169,16 +169,16 @@ export default function Results() {
                   className="detail-logo"
                   style={{ background: "linear-gradient(135deg,#4f6ef7,#7c3aed)" }}
                 >
-                  📌
+                  
                 </div>
                 <div style={{ flex: 1 }}>
                   <div className="detail-title">{selected.job || selected.job_title}</div>
                   <div className="detail-sub">
-                    🏢 {selected.company} · 📍 {selected.location}
+                     {selected.company} ·  {selected.location}
                   </div>
                   {selected.sector && (
                     <span className="chip" style={{ marginTop: 6, display: "inline-block" }}>
-                      🏷️ {selected.sector}
+                       {selected.sector}
                     </span>
                   )}
                 </div>
@@ -230,7 +230,7 @@ export default function Results() {
                   <div className="chips">
                     {selected.skills.slice(0, 10).map((s, i) => (
                       <span key={i} className={`chip${s.startsWith('[Hard]') ? ' match' : ''}`}>
-                        {s.replace('[Hard] ', '🔧 ').replace('[Soft] ', '💬 ')}
+                        {s.replace('[Hard] ', ' ').replace('[Soft] ', ' ')}
                       </span>
                     ))}
                   </div>

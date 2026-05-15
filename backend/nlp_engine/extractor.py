@@ -1,9 +1,9 @@
 import re
  
  
-# ──────────────────────────────────────────────
+
 # Section keywords map  (FR + EN)
-# ──────────────────────────────────────────────
+
 SECTION_KEYWORDS = {
     "skills": [
         "compétences", "competences", "skills", "technical skills",

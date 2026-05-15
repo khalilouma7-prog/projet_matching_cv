@@ -6,6 +6,7 @@ from nlp_engine.cv_reader import read_cv_file
 from nlp_engine.cleaner import clean_cv_text
 from users.models import UploadedCV, UserProfile
 from scraping.models import JobOffer
+from results.models import MatchResult  
 
 @csrf_exempt
 def match_uploaded_cv_view(request):
@@ -18,14 +19,13 @@ def match_uploaded_cv_view(request):
     if not (cv_file.name.endswith(".pdf") or cv_file.name.endswith(".docx")):
         return JsonResponse({"error": "Only PDF and DOCX files are allowed"}, status=400)
 
-    uploaded_cv = UploadedCV.objects.create(file=cv_file)  
+    uploaded_cv = UploadedCV.objects.create(file=cv_file)
     file_path = uploaded_cv.file.path
 
     try:
         cv_text = read_cv_file(file_path)
         cleaned_cv = clean_cv_text(cv_text)
 
-        # Récupère le profil si connecté, sinon valeurs par défaut
         user_profile = None
         if request.user.is_authenticated:
             user_profile = UserProfile.objects.filter(user=request.user).first()
@@ -36,12 +36,27 @@ def match_uploaded_cv_view(request):
             user_city=(user_profile.city if user_profile else ""),
         )
         results = matching_payload["results"]
+
+        # Sauvegarde MatchResult en base
+        if request.user.is_authenticated:
+            MatchResult.objects.filter(user=request.user).delete()
+            for item in results[:10]:
+                try:
+                    job = JobOffer.objects.get(id=item["job_id"])
+                    MatchResult.objects.create(
+                        user=request.user,
+                        job=job,
+                        final_score=item["final_score"]
+                    )
+                except JobOffer.DoesNotExist:
+                    pass
+
         return JsonResponse({
-    "filename": cv_file.name,
-    "total_results": len(results),
-    "clustering": matching_payload["clustering"],
-    "results": results[:10],
-})
+            "filename": cv_file.name,
+            "total_results": len(results),
+            "clustering": matching_payload["clustering"],
+            "results": results[:10],
+        })
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
@@ -50,7 +65,6 @@ def match_uploaded_cv_view(request):
 def map_offers_view(request):
     if request.method != "GET":
         return JsonResponse({"error": "Use GET method"}, status=405)
-    from scraping.models import JobOffer
     offers = JobOffer.objects.all()
     points = []
     for offer in offers:

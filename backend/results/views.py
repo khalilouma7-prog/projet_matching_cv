@@ -6,9 +6,9 @@ from collections import Counter
 from results.models import MatchResult
 from scraping.models import JobOffer
 
-# ==========================================
+
 # 1. VUE POUR LA PAGE "MES RÉSULTATS"
-# ==========================================
+
 @csrf_exempt
 @require_http_methods(["GET"])
 def get_results(request):
@@ -29,7 +29,7 @@ def get_results(request):
 # ==========================================
 # 2. VUE POUR LA PAGE "DASHBOARD GLOBAL"
 # ==========================================
-@csrf_exempt  # ✅ remplace @api_view + @permission_classes
+@csrf_exempt
 @require_http_methods(["GET"])
 def dashboard_global_stats(request):
     CLUSTER_NAMES = {
@@ -44,19 +44,30 @@ def dashboard_global_stats(request):
     }
     CLUSTER_COLORS = ["#3d7fff","#a855f7","#f59e0b","#ef4444","#00e5a0","#06b6d4","#f43f5e","#8b5cf6"]
 
-    # KPIs
+    # KPIs globaux
     total_offres = JobOffer.objects.count()
-    domaines_count = JobOffer.objects.filter(cluster_id__isnull=False).values('cluster_id').distinct().count()
+    domaines_count = JobOffer.objects.filter(
+        cluster_id__isnull=False
+    ).values('cluster_id').distinct().count()
 
     # Stats utilisateur si connecté
     cv_analyses = 0
     avg_score = 0
     history_data = []
     if request.user.is_authenticated:
-        cv_analyses = MatchResult.objects.filter(user=request.user).dates('created_at', 'day').count()
-        avg_dict = MatchResult.objects.filter(user=request.user).aggregate(Avg('final_score'))
+        cv_analyses = MatchResult.objects.filter(
+            user=request.user
+        ).dates('created_at', 'day').count()
+        
+        avg_dict = MatchResult.objects.filter(
+            user=request.user
+        ).aggregate(Avg('final_score'))
         avg_score = round(avg_dict['final_score__avg'] or 0)
-        recent = MatchResult.objects.filter(user=request.user).select_related('job').order_by('-created_at')[:3]
+        
+        recent = MatchResult.objects.filter(
+            user=request.user
+        ).select_related('job').order_by('-created_at')[:3]
+        
         for match in recent:
             history_data.append({
                 "id": match.id,
@@ -66,8 +77,11 @@ def dashboard_global_stats(request):
                 "domaine": CLUSTER_NAMES.get(match.job.cluster_id, "Non précisé")
             })
 
-    # Clusters
-    clusters_db = JobOffer.objects.filter(cluster_id__isnull=False).values('cluster_id').annotate(count=Count('id')).order_by('-count')[:5]
+    # Clusters — Répartition du marché
+    clusters_db = JobOffer.objects.filter(
+        cluster_id__isnull=False
+    ).values('cluster_id').annotate(count=Count('id')).order_by('-count')[:5]
+    
     clusters_data = []
     for i, item in enumerate(clusters_db):
         c_id = item['cluster_id']
@@ -77,11 +91,15 @@ def dashboard_global_stats(request):
             "color": CLUSTER_COLORS[i % len(CLUSTER_COLORS)]
         })
 
-    # Top Skills
+    # Top Skills — nettoie [Hard] et [Soft]
     all_skills = []
     for offer in JobOffer.objects.exclude(skills=[]).order_by('-scraped_at')[:500]:
         if isinstance(offer.skills, list):
-            all_skills.extend(offer.skills)
+            for skill in offer.skills:
+                clean = skill.replace('[Hard] ', '').replace('[Soft] ', '').strip()
+                if clean:
+                    all_skills.append(clean)
+
     word_counts = Counter(all_skills).most_common(12)
     global_words = [
         {

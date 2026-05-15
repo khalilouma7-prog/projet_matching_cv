@@ -167,7 +167,7 @@ export default function Profile({ user }) {
             </div>
           </div>
 
-          {/* ✅ Historique des matchings */}
+          {/*  Historique des matchings */}
           <div className="card">
             <div className="card-header">
               <span className="card-title">Historique des matchings</span>
@@ -175,7 +175,7 @@ export default function Profile({ user }) {
             </div>
             {historique.length === 0 ? (
               <div className="db-empty">
-                <div className="db-empty-icon">📂</div>
+                <div className="db-empty-icon"></div>
                 <div className="db-empty-text">Aucun matching effectué</div>
                 <div style={{ fontSize:12, color:"var(--muted)", marginTop:4 }}>
                   Uploadez un CV dans "Mes résultats"
@@ -192,7 +192,7 @@ export default function Profile({ user }) {
                 {historique.map((h, i) => (
                   <div key={i} className="hist-row">
                     <span className="hist-date">{h.date}</span>
-                    <span className="hist-file">📄 {h.filename}</span>
+                    <span className="hist-file"> {h.filename}</span>
                     <span className="hist-score" style={{
                       color: h.topScore >= 60 ? "#059669" : h.topScore >= 40 ? "#d97706" : "#dc2626"
                     }}>{h.topScore}%</span>

@@ -28,6 +28,10 @@ def compute_matching(
     cosine_scores = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
     cluster_labels, optimal_k = build_job_clusters(job_texts)
 
+    #  Sauvegarde cluster_id en base pour le dashboard
+    for i, job in enumerate(jobs):
+        JobOffer.objects.filter(id=job.id).update(cluster_id=int(cluster_labels[i]))
+
     results = []
     for i, job in enumerate(jobs):
         job_text = job.description or ""
@@ -52,8 +56,12 @@ def compute_matching(
             "job_id": job.id,
             "job": job.title,
             "company": job.company,
+            "sector": job.sector,
             "location": job.location,
             "contract": job.contract,
+            "experience": job.experience,
+            "skills": job.skills,
+            "url": job.url,
             "lat": lat,
             "lng": lng,
             "cluster_id": int(cluster_labels[i]),
@@ -62,11 +70,6 @@ def compute_matching(
             "experience_score": float(round(exp_score * 100, 2)),
             "geo_score": float(round(geo_score * 100, 2)),
             "final_score": float(round(final_score * 100, 2)),
-            "experience": job.experience,   # ✅ ajouté
-            "skills": job.skills,           # ✅ ajouté (hard+soft)
-            "url": job.url,                 # ✅ ajouté
-            "lat": lat,
-              "sector": job.sector, 
         })
 
     results.sort(key=lambda x: x["final_score"], reverse=True)

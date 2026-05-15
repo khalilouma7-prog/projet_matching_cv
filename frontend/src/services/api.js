@@ -3,11 +3,12 @@ import axios from "axios";
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
   headers: { "Content-Type": "application/json" },
+  withCredentials: true,  //  envoie les cookies de session
 });
 
 export const resultsAPI = {
   getResults: () => API.get("/results/"),
-  getDashboardStats: () => API.get("/results/dashboard-stats/"),  // ✅
+  getDashboardStats: () => API.get("/results/dashboard-stats/"),
 };
 
 export const authAPI = {
@@ -18,7 +19,7 @@ export const authAPI = {
 export const profileAPI = {
   get: (userId) => API.get(`/users/users/${userId}/`),
   update: (userId, data) => API.put(`/users/users/${userId}/`, data),
-  uploadCV: (file) => {                              
+  uploadCV: (file) => {
     const form = new FormData();
     form.append("cv", file);
     return API.post("/matching/match-cv/", form, {
@@ -39,4 +40,3 @@ export const matchingAPI = {
 };
 
 export default API;
-

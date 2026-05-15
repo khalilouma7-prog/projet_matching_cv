@@ -8,9 +8,9 @@ import re
 import spacy
 from typing import List, Dict
  
-# ──────────────────────────────────────────────
+
 # Load spaCy model (French + English fallback)
-# ──────────────────────────────────────────────
+
 try:
     nlp = spacy.load("fr_core_news_md")
 except OSError:
@@ -25,9 +25,9 @@ except OSError:
             nlp = spacy.blank("fr")
  
  
-# ──────────────────────────────────────────────
+
 # Technical Skills Dictionary
-# ──────────────────────────────────────────────
+
 TECHNICAL_SKILLS: Dict[str, List[str]] = {
     # Programming languages
     "programming_languages": [
