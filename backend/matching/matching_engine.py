@@ -62,6 +62,11 @@ def compute_matching(
             "experience_score": float(round(exp_score * 100, 2)),
             "geo_score": float(round(geo_score * 100, 2)),
             "final_score": float(round(final_score * 100, 2)),
+            "experience": job.experience,   # ✅ ajouté
+            "skills": job.skills,           # ✅ ajouté (hard+soft)
+            "url": job.url,                 # ✅ ajouté
+            "lat": lat,
+              "sector": job.sector, 
         })
 
     results.sort(key=lambda x: x["final_score"], reverse=True)
