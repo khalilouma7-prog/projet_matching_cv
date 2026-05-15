@@ -1,5 +1,6 @@
 import os, django, sys, requests, re, time
 from bs4 import BeautifulSoup
+from datetime import date
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
@@ -12,58 +13,131 @@ HEADERS = {
     "Accept-Language": "fr-FR,fr;q=0.9",
 }
 
-COMPETENCES = [
+HARD_SKILLS = [
     'python', 'java', 'javascript', 'php', 'sql', 'react', 'django',
-    'html', 'css', 'machine learning', 'excel', 'git', 'docker', 'linux',
-    'mysql', 'mongodb', 'pandas', 'numpy', 'power bi', 'spark',
+    'html', 'css', 'machine learning', 'deep learning', 'git', 'docker',
+    'linux', 'mysql', 'mongodb', 'pandas', 'numpy', 'power bi', 'tableau',
+    'spark', 'hadoop', 'tensorflow', 'keras', 'scikit-learn', 'r studio',
+    'angular', 'vue', 'node', 'spring', 'laravel', 'postgresql', 'oracle',
+    'aws', 'azure', 'devops', 'kotlin', 'swift', 'flutter', 'excel', 'vba',
 ]
 
-def extraire_competences(texte):
-    return [c for c in COMPETENCES if c in texte.lower()]
+SOFT_SKILLS = [
+    'communication', 'leadership', 'travail en équipe', 'teamwork',
+    'gestion de projet', 'project management', 'créativité', 'autonomie',
+    'organisation', 'rigueur', 'adaptabilité', 'esprit d\'analyse',
+    'sens des responsabilités', 'polyvalence', 'proactivité',
+]
+
+SECTEURS = {
+    'informatique': ['informatique', 'it', 'digital', 'logiciel', 'software', 'web', 'data', 'cloud', 'réseau', 'télécommunication'],
+    'finance': ['finance', 'comptabilité', 'audit', 'banque', 'assurance', 'contrôle de gestion'],
+    'marketing': ['marketing', 'communication', 'commercial', 'vente', 'business development'],
+    'rh': ['ressources humaines', 'rh', 'recrutement', 'formation', 'paie'],
+    'ingénierie': ['ingénieur', 'génie civil', 'mécanique', 'électrique', 'industriel'],
+    'santé': ['santé', 'médecin', 'pharmacie', 'biologie', 'médical'],
+    'logistique': ['logistique', 'supply chain', 'transport', 'achat'],
+}
+
+def detecter_secteur(texte):
+    texte_lower = texte.lower()
+    for secteur, mots in SECTEURS.items():
+        if any(m in texte_lower for m in mots):
+            return secteur.capitalize()
+    return "Autre"
+
+def extraire_skills(texte):
+    t = texte.lower()
+    hard = [s for s in HARD_SKILLS if s in t]
+    soft = [s for s in SOFT_SKILLS if s in t]
+    return hard, soft
+
+def extraire_experience(texte):
+    patterns = [
+        r'(\d+)\s*[\-à]\s*(\d+)\s*ans?',
+        r'(\d+)\s*ans?\s*d.expérience',
+        r'minimum\s*(\d+)\s*ans?',
+        r'au moins\s*(\d+)\s*ans?',
+    ]
+    for p in patterns:
+        m = re.search(p, texte.lower())
+        if m:
+            return m.group(0)
+    return "Non précisé"
+
+def extraire_date(soup):
+    selectors = [
+        ('span', 'date'), ('div', 'date'), ('time', None),
+        ('span', 'published'), ('p', 'date-publication'),
+    ]
+    for tag, cls in selectors:
+        el = soup.find(tag, class_=cls) if cls else soup.find(tag)
+        if el and el.text.strip():
+            texte = el.text.strip()
+            m = re.search(r'\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}', texte)
+            if m:
+                return m.group(0)
+    return None
 
 def get_details_rekrute(url_offre):
     try:
-        time.sleep(2)
+        time.sleep(1.5)
         r = requests.get(url_offre, headers=HEADERS, timeout=10)
         soup = BeautifulSoup(r.text, 'html.parser')
 
+        # Entreprise
         entreprise = "Non précisé"
-        for tag, cls in [('a','nameEts'),('span','company'),('div','company-name')]:
+        for tag, cls in [('a','nameEts'),('span','company'),('div','company-name'),('h2','company')]:
             t = soup.find(tag, class_=cls)
-            if t: entreprise = t.text.strip(); break
+            if t and t.text.strip():
+                entreprise = t.text.strip(); break
 
+        # Description
         description = ""
-        for cls in ['detailsOffre','jobDescription','details','description']:
+        for cls in ['detailsOffre','jobDescription','details','description','job-details']:
             t = soup.find('div', class_=cls)
-            if t: description = t.text.strip(); break
+            if t:
+                description = t.get_text(separator=' ').strip(); break
         if not description:
-            main = soup.find('div', class_='col-md-8') or soup.find('main')
-            if main: description = main.text.strip()[:2000]
+            main = soup.find('div', class_='col-md-8') or soup.find('main') or soup.find('article')
+            if main:
+                description = main.get_text(separator=' ').strip()[:3000]
 
-        experience = 0
-        m = re.search(r'(\d+)\s*(an|année)', description.lower())
-        if m: experience = int(m.group(1))
+        # Expérience
+        experience = extraire_experience(description)
 
-        return entreprise, description, extraire_competences(description), experience
+        # Skills
+        hard, soft = extraire_skills(description)
+        all_skills = [f"[Hard] {s}" for s in hard] + [f"[Soft] {s}" for s in soft]
+
+        # Secteur
+        secteur = detecter_secteur(description)
+
+        # Date
+        published_at = extraire_date(soup)
+
+        return entreprise, description, all_skills, experience, secteur, published_at
+
     except Exception as e:
-        print(f"    Erreur : {e}")
-        return "Non précisé", "", [], 0
+        print(f"    Erreur détail : {e}")
+        return "Non précisé", "", [], "Non précisé", "Autre", None
 
 
-def scrape_rekrute(keyword="informatique", pages=2):
+def scrape_rekrute(keyword="informatique", pages=3):
     total = 0
-    print("\n🔵 SCRAPING REKRUTE")
+    print(f"\nSCRAPING REKRUTE — '{keyword}'")
     for page in range(1, pages + 1):
         url = f"https://www.rekrute.com/offres.html?s={keyword}&p={page}"
-        print(f"📄 Page {page}")
+        print(f" Page {page}/{pages}")
         try:
             r = requests.get(url, headers=HEADERS, timeout=10)
             soup = BeautifulSoup(r.text, 'html.parser')
             annonces = soup.find_all('li', class_='post-id')
-            print(f"   → {len(annonces)} offres")
+            print(f"   → {len(annonces)} offres trouvées")
 
             for annonce in annonces:
                 try:
+                    # Titre
                     titre_tag = annonce.find('a', class_='titreJob')
                     if not titre_tag:
                         h2 = annonce.find('h2')
@@ -73,46 +147,72 @@ def scrape_rekrute(keyword="informatique", pages=2):
                     titre = titre_tag.text.strip()
                     url_offre = "https://www.rekrute.com" + titre_tag['href']
 
+                    # Localisation depuis titre
                     localisation = "Non précisé"
                     if "|" in titre:
                         p = titre.split("|")
                         titre = p[0].strip()
                         localisation = p[1].strip()
 
+                    # Localisation depuis annonce
+                    if localisation == "Non précisé":
+                        loc_tag = annonce.find('span', class_='location') or \
+                                  annonce.find('li', class_='location')
+                        if loc_tag:
+                            localisation = loc_tag.text.strip()
+
+                    # Contrat
                     contrat = "Autre"
+                    texte_annonce = annonce.text.lower()
                     for c in ['CDI','CDD','Stage','Freelance']:
-                        if c.lower() in annonce.text.lower():
+                        if c.lower() in texte_annonce:
                             contrat = c; break
 
-                    entreprise, desc, skills, exp = get_details_rekrute(url_offre)
+                    print(f"     {titre[:45]}...")
+                    entreprise, desc, skills, exp, secteur, pub_date = get_details_rekrute(url_offre)
 
                     _, created = JobOffer.objects.get_or_create(
                         url=url_offre,
                         defaults={
                             'title': titre,
                             'company': entreprise,
+                            'sector': secteur,           # secteur
                             'location': localisation,
                             'contract': contrat,
                             'description': desc,
-                            'experience': str(exp),
-                            'skills': skills,
+                            'experience': exp,           # expérience
+                            'skills': skills,            #  hard + soft skills
                             'source': 'rekrute',
+                            'published_at': None,
                         }
                     )
-                    if created: total += 1; print(f"    ✅ {titre[:40]}")
+                    if created:
+                        total += 1
+                        print(f"     Sauvegardé : {titre[:40]}")
+                    else:
+                        print(f"    ⏭  Déjà en base")
 
                 except Exception as e:
-                    print(f"    Erreur offre : {e}")
+                    print(f"     Erreur offre : {e}")
+
         except Exception as e:
-            print(f"    Erreur page : {e}")
+            print(f"   Erreur page {page} : {e}")
+
     return total
 
 
 if __name__ == "__main__":
-    print("🗑️  Suppression des anciennes offres...")
+    keywords = ["informatique", "data science", "développeur", "marketing", "finance"]
+
+    print(" Suppression des anciennes offres...")
     JobOffer.objects.all().delete()
 
-    total = scrape_rekrute(keyword="informatique", pages=3)
+    total = 0
+    for kw in keywords:
+        total += scrape_rekrute(keyword=kw, pages=2)
+        time.sleep(3)
 
-    print(f"\n✅ TOTAL : {total} offres sauvegardées")
+    print(f"\n{'='*50}")
+    print(f" TOTAL : {total} offres sauvegardées")
     print(f"   En base : {JobOffer.objects.count()} offres")
+    print(f"{'='*50}")

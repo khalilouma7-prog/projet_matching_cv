@@ -18,7 +18,7 @@ def match_uploaded_cv_view(request):
     if not (cv_file.name.endswith(".pdf") or cv_file.name.endswith(".docx")):
         return JsonResponse({"error": "Only PDF and DOCX files are allowed"}, status=400)
 
-    uploaded_cv = UploadedCV.objects.create(file=cv_file)  # ✅ pas de user requis
+    uploaded_cv = UploadedCV.objects.create(file=cv_file)  
     file_path = uploaded_cv.file.path
 
     try:
@@ -37,11 +37,11 @@ def match_uploaded_cv_view(request):
         )
         results = matching_payload["results"]
         return JsonResponse({
-            "filename": cv_file.name,
-            "total_results": len(results),
-            "clustering": matching_payload["clustering"],
-            "results": results[:10],
-        })
+    "filename": cv_file.name,
+    "total_results": len(results),
+    "clustering": matching_payload["clustering"],
+    "results": results[:10],
+})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
