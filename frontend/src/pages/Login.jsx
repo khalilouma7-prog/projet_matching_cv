@@ -3,10 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import api from "../services/api"
 
 const FEATURES = [
-  { icon: "🔍", text: "Web Scraping automatisé (Rekrute, Indeed…)" },
-  { icon: "🧠", text: "Analyse NLP de votre CV avec spaCy + TF-IDF" },
-  { icon: "📊", text: "Score pondéré : Cosinus + Jaccard + Exp + Géo" },
-  { icon: "🗂️", text: "Clustering K-Means des offres par domaine" },
+  
 ]
 
 export default function Login() {
@@ -30,13 +27,12 @@ export default function Login() {
     <div style={S.page}>
       {/* Gauche */}
       <div style={S.left}>
-        <div style={S.brand}>◆ CV&MATCH PLATFORM</div>
+        <div style={S.brand}></div>
         <h1 style={S.heroTitle}>
-          Trouvez l'offre<br/>
-          qui vous <span style={{ color: '#4f6ef7' }}>correspond</span><br/>
-          vraiment.
+         <br/>
+          <span style={{ color: '#4f6ef7' }}></span><br/>
         </h1>
-        <p style={S.heroSub}>Intelligence artificielle et Data Mining pour matcher votre profil avec les meilleures offres du marché.</p>
+        <p style={S.heroSub}></p>
         <div style={S.features}>
           {FEATURES.map(f => (
             <div key={f.text} style={S.feature}>
